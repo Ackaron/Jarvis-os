@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Secrets
+.env
+
+# Local runtime data (Phase 0 JSON task store)
+storage/tasks.json
+
+# OS
+.DS_Store
+Thumbs.db

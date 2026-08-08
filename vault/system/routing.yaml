@@ -1,0 +1,87 @@
+version: 1.0
+
+defaults:
+  primary_model: claude-opus
+  fallback_chain: [claude-sonnet, ollama-local]
+  timeout_seconds: 60
+  retry_attempts: 3
+
+routing_rules:
+  presentation:
+    primary: claude-opus
+    fallback: [claude-sonnet]
+    reason: "Complex stakeholder preferences, needs creative synthesis"
+    budget_aware: false
+    confidence_threshold: 0.8
+
+  report:
+    primary: claude-opus
+    fallback: [claude-sonnet]
+    reason: "Data accuracy important, some creativity needed"
+    budget_aware: true
+
+  email:
+    primary: claude-sonnet
+    observer: ollama-mistral
+    fallback: [claude-opus]
+    reason: "Sonnet handles tone modulation well, Ollama learns style"
+    confidence_threshold: 0.85
+
+  task_classification:
+    primary: ollama-local
+    fallback: [claude-sonnet]
+    reason: "Fast, deterministic, no need for Opus"
+    confidence_threshold: 0.7
+
+  analysis:
+    primary: claude-opus
+    fallback: false
+    reason: "Number accuracy non-negotiable"
+
+  research:
+    primary: claude-opus
+    fallback: [claude-sonnet]
+    reason: "Needs deep reasoning"
+
+hybrid_mode:
+  enabled: true
+  observer_models: [ollama-local, ollama-mistral]
+  sync_interval_tasks: 10
+  suggest_override_threshold: 0.95
+
+models:
+  claude-opus:
+    api_provider: anthropic
+    cost_per_1k_tokens: 0.015
+    speed_tier: slow
+    reasoning_quality: excellent
+    supports_web_search: true
+    context_window: 200000
+
+  claude-sonnet:
+    api_provider: anthropic
+    cost_per_1k_tokens: 0.003
+    speed_tier: medium
+    reasoning_quality: good
+    supports_web_search: true
+    context_window: 200000
+
+  ollama-local:
+    api_provider: local
+    cost_per_1k_tokens: 0.0
+    speed_tier: very-fast
+    reasoning_quality: medium
+    supports_web_search: false
+    context_window: 8192
+
+fallback_behavior:
+  max_retries: 3
+  retry_delay_seconds: 2
+  backoff_strategy: exponential
+  notify_on_fallback: true
+
+cost_tracking:
+  enabled: true
+  monthly_budget_dollars: 100
+  alert_threshold_percent: 80
+  log_to_db: true

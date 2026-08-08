@@ -1,0 +1,34 @@
+version: 1.0
+
+domains:
+  intc:
+    name: "ИНТЦ"
+    aliases: ["интц", "innovation center", "резиденты"]
+    description: "Инновационный центр — резиденты, инвесторы, презентации, отчёты"
+    icon: "🏛"
+    color_hex: "#0066FF"
+    is_active: true
+
+  bootlegger:
+    name: "Bootlegger"
+    aliases: ["бар", "бутлегер"]
+    description: "Бар — продажи, инвентарь, еженедельные отчёты (FusionPOS)"
+    icon: "🍸"
+    color_hex: "#FF3366"
+    is_active: true
+
+  house:
+    name: "Дом"
+    aliases: ["дом", "стройка", "house"]
+    description: "Строительство дома — бюджет, подрядчики, график"
+    icon: "🏠"
+    color_hex: "#00CC00"
+    is_active: true
+
+  education:
+    name: "Образование"
+    aliases: ["образование", "учеба", "education"]
+    description: "Обучение — курсы, прогресс, дедлайны"
+    icon: "🎓"
+    color_hex: "#FF9900"
+    is_active: true
