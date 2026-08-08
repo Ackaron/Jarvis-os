@@ -9,8 +9,9 @@ venv/
 # Secrets
 .env
 
-# Local runtime data (Phase 0 JSON task store)
+# Local runtime data (JSON task/decisions stores)
 storage/tasks.json
+storage/decisions.json
 
 # OS
 .DS_Store
