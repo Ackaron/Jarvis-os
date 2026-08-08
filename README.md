@@ -12,24 +12,25 @@
 
 ## Структура репозитория
 ```
-core/            intent_router, llm_router, context_engine, config_loader
+core/            intent_router, llm_router, llm_client, context_engine, config_loader,
+                 quality_assurance, mentoring
 interfaces/      web/telegram интерфейсы (появятся в Phase 2)
-workflows/       presentation/report/email воркфлоу (Phase 1)
-storage/         локальное хранилище задач (JSON на Phase 0, без Supabase)
-integrations/    obsidian, bitrix, fusionpos, telegram — коннекторы
+workflows/       engine.py (interface-agnostic движок) + presentation/report/email воркфлоу
+storage/         локальное хранилище задач и decisions (JSON, без Supabase)
+integrations/    obsidian (реальный), bitrix/fusionpos/telegram — структурные заглушки
 vault/           Obsidian vault: system/ (конфиги), architecture/ (ADR), sessions/
-tests/           pytest smoke-тесты для core/storage/integrations
+tests/           pytest-сьют для core/storage/integrations/workflows
 ```
 
-Архитектурные решения по Phase 0 (границы скоупа, порядок сборки) — в [ADR-004](vault/architecture/ADR-004-phase0-scaffold.md).
+Архитектурные решения: [ADR-004](vault/architecture/ADR-004-phase0-scaffold.md) (Phase 0 — backend-скелет), [ADR-005](vault/architecture/ADR-005-phase1-workflows.md) (Phase 1 — interface-agnostic воркфлоу, LLM-вызовы через DI).
 
-## Запуск (Phase 0)
+## Запуск
 ```bash
 pip install -r requirements.txt
 python -m pytest -q
 ```
 
-Phase 0 — чисто backend-скелет на Python: нет Next.js/UI, нет Postgres/Docker, нет реальных вызовов LLM или внешних API (Bitrix/FusionPOS/Telegram — структурные заглушки). Подробности и обоснование — в ADR-004.
+Воркфлоу (`workflows/`) полностью тестируются без реального `ANTHROPIC_API_KEY` — LLM-вызовы и человеческий ввод инжектируются (см. ADR-005). Ключ нужен только для реального прогона генерации. Bitrix/FusionPOS/Telegram — структурные заглушки без реальных API-вызовов (см. ADR-004).
 
 ## Статус
 Текущая фаза и активная задача — см. [.planning/STATE.md](.planning/STATE.md).

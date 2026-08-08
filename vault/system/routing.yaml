@@ -52,6 +52,7 @@ hybrid_mode:
 models:
   claude-opus:
     api_provider: anthropic
+    api_model_id: claude-opus-5
     cost_per_1k_tokens: 0.015
     speed_tier: slow
     reasoning_quality: excellent
@@ -60,6 +61,7 @@ models:
 
   claude-sonnet:
     api_provider: anthropic
+    api_model_id: claude-sonnet-5
     cost_per_1k_tokens: 0.003
     speed_tier: medium
     reasoning_quality: good

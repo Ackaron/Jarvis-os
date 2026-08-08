@@ -48,19 +48,32 @@ class ObsidianVault:
     @staticmethod
     def parse_frontmatter(content: str) -> tuple[dict, str]:
         """Splits a note into (yaml_frontmatter_dict, body). Returns ({}, content)
-        if there's no valid frontmatter block."""
-        lines = content.splitlines()
-        if not lines or lines[0].strip() != FRONTMATTER_DELIMITER:
+        if there's no valid frontmatter block. Preserves the body exactly
+        (including trailing newlines) so render_frontmatter round-trips it."""
+        opening = f"{FRONTMATTER_DELIMITER}\n"
+        if not content.startswith(opening):
             return {}, content
 
-        for i in range(1, len(lines)):
-            if lines[i].strip() == FRONTMATTER_DELIMITER:
-                frontmatter_raw = "\n".join(lines[1:i])
-                body = "\n".join(lines[i + 1 :]).lstrip("\n")
-                metadata = yaml.safe_load(frontmatter_raw) or {}
-                return metadata, body
+        closing = f"\n{FRONTMATTER_DELIMITER}\n"
+        end_index = content.find(closing, len(opening))
+        if end_index == -1:
+            return {}, content
 
-        return {}, content
+        frontmatter_raw = content[len(opening) : end_index]
+        body = content[end_index + len(closing) :]
+        metadata = yaml.safe_load(frontmatter_raw) or {}
+        return metadata, body
 
     def read_note_parsed(self, relative_path: str) -> tuple[dict, str]:
         return self.parse_frontmatter(self.read_note(relative_path))
+
+    @staticmethod
+    def render_frontmatter(metadata: dict, body: str) -> str:
+        """Inverse of parse_frontmatter. Returns body unchanged if metadata is empty."""
+        if not metadata:
+            return body
+        frontmatter_raw = yaml.safe_dump(metadata, allow_unicode=True, sort_keys=False).strip()
+        return f"{FRONTMATTER_DELIMITER}\n{frontmatter_raw}\n{FRONTMATTER_DELIMITER}\n{body}"
+
+    def write_note_with_frontmatter(self, relative_path: str, metadata: dict, body: str) -> None:
+        self.write_note(relative_path, self.render_frontmatter(metadata, body))

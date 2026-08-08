@@ -27,14 +27,23 @@
 **Definition of Done Phase 0**: репозиторий содержит рабочую структуру папок, `routing.yaml`/`domains.yaml` валидны, core-компоненты импортируются и проходят smoke-тест (без реального LLM-вызова), заглушки интеграций задокументированы, `README.md` создан.
 
 ### 🔵 Phase 1: Core Workflows (Week 2-3)
-Источник: `PROJECT_IDEA.md` → MVP Scope → Phase 1.
+Источник: `PROJECT_IDEA.md` → MVP Scope → Phase 1. Архитектурные решения и порядок сборки — в [[ADR-005-phase1-workflows]]: interface-agnostic engine (инъекция `human_input`, Phase 2 подключит реальный UI), LLM-вызовы через DI (бизнес-логика тестируется без ключа), email-воркфлоу первым как самый дешёвый способ провалидировать engine.
 
-- [ ] Presentation workflow (collect → verify → mockup → fill → approve).
-- [ ] Report workflow (data → analyze → visualize → deliver).
-- [ ] Email workflow (letter → thesis → formal → template).
-- [ ] Quality Assurance checks (чеклист по истории стейкхолдера).
-- [ ] Why Extraction (захват причины каждой правки → `decisions`).
-- [ ] Mentoring Mode (объяснение решений по запросу "почему?").
+Атомарные задачи (строго в этом порядке, см. ADR-005 §3 для зависимостей):
+1. [ ] `storage/decisions_store.py` — JSON-хранилище decisions (Why Extraction).
+2. [ ] `core/context_engine.update_stakeholder_profile()` — запись/мердж frontmatter стейкхолдера.
+3. [ ] `core/llm_client.py` — реальная Anthropic-обёртка (`call_anthropic`), явная ошибка без `ANTHROPIC_API_KEY`.
+4. [ ] `workflows/engine.py` — Step/Workflow движок, инъекция `human_input`, интеграция с `tasks_store`/`decisions_store`. *(зависит от 1)*
+5. [ ] `workflows/email_workflow.py` — letter → thesis → formal → review → save template. *(зависит от 3, 4)*
+6. [ ] `workflows/report_workflow.py` — data (заглушка через `context_engine.get_knowledge`) → analyze → deliver. *(зависит от 3, 4)*
+7. [ ] `workflows/presentation_workflow.py` — collect → verify → mockup → fill → approve. *(зависит от 2, 3, 4)*
+8. [ ] `core/quality_assurance.py` — чеклист из `stakeholder.metadata.usual_checks`. *(зависит от 2)*
+9. [ ] `core/mentoring.py` — объяснение "почему" из `decisions_store` + профиля. *(зависит от 1, 2)*
+10. [ ] Подключить QA (8) и Mentoring (9) к завершающему шагу воркфлоу (5, 6, 7).
+11. [ ] pytest-сьют на все новые модули (scripted `human_input`, fake LLM caller) — прогнать, исправить баги.
+12. [ ] Обновить `requirements.txt` (+`anthropic`), `README.md`.
+
+**Definition of Done Phase 1**: все три воркфлоу проходят end-to-end через pytest со scripted `human_input` и fake LLM caller (без реального ключа), decisions и stakeholder-правки реально пишутся в vault, QA/Mentoring подключены и покрыты тестами.
 
 ### 🟣 Phase 2: Learning & Scheduling (Week 3-4)
 - [ ] Stakeholder profiling (автопостроение из правок).
