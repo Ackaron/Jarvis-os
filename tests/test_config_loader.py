@@ -9,7 +9,7 @@ def test_routing_config_has_defaults():
 
 def test_routing_config_has_presentation_rule():
     config = get_routing_config()
-    assert config["routing_rules"]["presentation"]["primary"] == "ollama-local"
+    assert config["routing_rules"]["presentation"]["primary"] == "ollama-main"
 
 
 def test_domains_config_has_four_domains():

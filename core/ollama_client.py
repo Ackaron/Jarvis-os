@@ -58,10 +58,20 @@ def call_ollama(
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
 
+    # Ollama defaults num_ctx to 2048 regardless of what the model actually
+    # supports — without this, long prompts (stakeholder data + structure)
+    # get silently truncated. Sourced from routing.yaml's context_window.
+    num_ctx = model_info.get("context_window", 8192)
+
     try:
         response = client.post(
             "/api/chat",
-            json={"model": api_model_id, "messages": messages, "stream": False},
+            json={
+                "model": api_model_id,
+                "messages": messages,
+                "stream": False,
+                "options": {"num_ctx": num_ctx},
+            },
         )
         response.raise_for_status()
         data = response.json()

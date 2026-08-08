@@ -43,9 +43,10 @@ def test_unregistered_provider_raises(monkeypatch):
         call_model("mystery-model", {"prompt": "hi"}, config=ROUTING_CONFIG)
 
 
-def test_call_model_uses_real_ollama_local_by_default():
-    """Sanity check against the real vault/system/routing.yaml (post-ADR-007:
-    Ollama is primary), using an injected caller so no network call happens."""
+def test_call_model_uses_real_ollama_main_by_default():
+    """Sanity check against the real vault/system/routing.yaml (post-ADR-008:
+    Ollama's 'main' tier is the default), using an injected caller so no
+    network call happens."""
     from core.llm_dispatch import call_model as real_call_model
 
     calls = []
@@ -59,9 +60,9 @@ def test_call_model_uses_real_ollama_local_by_default():
     original = dispatch_module.PROVIDER_CALLERS["local"]
     dispatch_module.PROVIDER_CALLERS["local"] = fake_caller
     try:
-        result = real_call_model("ollama-local", {"prompt": "hi"})
+        result = real_call_model("ollama-main", {"prompt": "hi"})
     finally:
         dispatch_module.PROVIDER_CALLERS["local"] = original
 
     assert result["text"] == "ok"
-    assert calls == ["ollama-local"]
+    assert calls == ["ollama-main"]

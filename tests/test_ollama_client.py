@@ -64,6 +64,29 @@ def test_call_with_injected_fake_client_returns_text():
     assert client.closed is False  # injected clients aren't auto-closed
 
 
+def test_num_ctx_defaults_to_8192_when_not_configured():
+    client = _FakeHttpClient()
+    call_ollama("ollama-local", {"prompt": "hi"}, config=ROUTING_CONFIG, client=client)
+    _, payload = client.last_call
+    assert payload["options"] == {"num_ctx": 8192}
+
+
+def test_num_ctx_uses_model_context_window_when_set():
+    config = {
+        "models": {
+            "ollama-local": {
+                "api_provider": "local",
+                "api_model_id": "llama3.1",
+                "context_window": 32768,
+            }
+        }
+    }
+    client = _FakeHttpClient()
+    call_ollama("ollama-local", {"prompt": "hi"}, config=config, client=client)
+    _, payload = client.last_call
+    assert payload["options"] == {"num_ctx": 32768}
+
+
 def test_system_prompt_included_when_provided():
     client = _FakeHttpClient()
     call_ollama(

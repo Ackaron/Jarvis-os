@@ -1,56 +1,61 @@
 version: 1.0
 
 # Anthropic/Claude access via omniroute is currently broken (401 invalid
-# x-api-key, unresolved) — Ollama is primary everywhere for now. See ADR-007.
+# x-api-key, unresolved) — Ollama is primary everywhere for now (ADR-007).
+# Three local tiers by task shape (ADR-008), on RTX 5080 16GB + 64GB DDR5:
+#   ollama-fast  — qwen2.5:7b-instruct  (~4.7GB, fully in VRAM, quick)
+#   ollama-main  — qwen2.5:14b-instruct (~9GB, fully in VRAM, everyday content)
+#   ollama-deep  — qwen2.5:32b-instruct (~20GB, partial CPU offload, slower
+#                  but higher accuracy — fine for less-interactive tasks)
 # claude-* model definitions are kept below so re-enabling them later is a
 # routing_rules edit, not a rewrite.
 
 defaults:
-  primary_model: ollama-local
-  fallback_chain: []
+  primary_model: ollama-main
+  fallback_chain: [ollama-fast]
   timeout_seconds: 60
   retry_attempts: 3
 
 routing_rules:
   presentation:
-    primary: ollama-local
-    fallback: false
-    reason: "Ollama primary while Anthropic access is unresolved (ADR-007)"
+    primary: ollama-main
+    fallback: [ollama-fast]
+    reason: "Formal Russian content generation; complex stakeholder preferences"
     budget_aware: false
     confidence_threshold: 0.8
 
   report:
-    primary: ollama-local
-    fallback: false
-    reason: "Ollama primary while Anthropic access is unresolved (ADR-007)"
+    primary: ollama-deep
+    fallback: [ollama-main]
+    reason: "Data accuracy important, some creativity needed"
     budget_aware: true
 
   email:
-    primary: ollama-local
-    fallback: false
-    reason: "Ollama primary while Anthropic access is unresolved (ADR-007)"
+    primary: ollama-main
+    fallback: [ollama-fast]
+    reason: "Formal Russian tone matters most; 14b handles it well"
     confidence_threshold: 0.85
 
   task_classification:
-    primary: ollama-local
+    primary: ollama-fast
     fallback: false
-    reason: "Fast, deterministic, no need for a large model"
+    reason: "Fast, deterministic JSON/classification output, no need for a large model"
     confidence_threshold: 0.7
 
   analysis:
-    primary: ollama-local
-    fallback: false
-    reason: "Ollama primary while Anthropic access is unresolved (ADR-007)"
+    primary: ollama-deep
+    fallback: [ollama-main]
+    reason: "Number accuracy non-negotiable"
 
   research:
-    primary: ollama-local
-    fallback: false
-    reason: "Ollama primary while Anthropic access is unresolved (ADR-007)"
+    primary: ollama-deep
+    fallback: [ollama-main]
+    reason: "Needs deep reasoning"
 
 hybrid_mode:
   enabled: false
   reason: "Observer pattern assumed a working cloud primary to compare against; paused until Anthropic access is restored (ADR-007)"
-  observer_models: [ollama-local]
+  observer_models: [ollama-fast]
   sync_interval_tasks: 10
   suggest_override_threshold: 0.95
 
@@ -73,14 +78,32 @@ models:
     supports_web_search: true
     context_window: 200000
 
-  ollama-local:
+  ollama-fast:
     api_provider: local
-    api_model_id: llama3.1  # поменяй на реальный тег после `ollama pull <model>`
+    api_model_id: qwen2.5:7b-instruct
     cost_per_1k_tokens: 0.0
     speed_tier: very-fast
-    reasoning_quality: medium
+    reasoning_quality: basic
     supports_web_search: false
     context_window: 8192
+
+  ollama-main:
+    api_provider: local
+    api_model_id: qwen2.5:14b-instruct
+    cost_per_1k_tokens: 0.0
+    speed_tier: fast
+    reasoning_quality: good
+    supports_web_search: false
+    context_window: 16384
+
+  ollama-deep:
+    api_provider: local
+    api_model_id: qwen2.5:32b-instruct
+    cost_per_1k_tokens: 0.0
+    speed_tier: slow
+    reasoning_quality: excellent
+    supports_web_search: false
+    context_window: 32768
 
 fallback_behavior:
   max_retries: 3
