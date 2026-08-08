@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from typing import Callable, Optional
 
 from core.context_engine import ContextEngine
-from core.llm_client import call_anthropic
+from core.llm_dispatch import call_model
 from core.llm_router import execute_with_fallback, route_task
 from workflows.engine import HumanInput, Workflow, cli_human_input
 
@@ -26,7 +26,7 @@ class ReportWorkflow(Workflow):
         domain: str,
         topic: str,
         human_input: HumanInput = cli_human_input,
-        llm_caller: LLMCaller = call_anthropic,
+        llm_caller: LLMCaller = call_model,
         context_engine: Optional[ContextEngine] = None,
         **kwargs,
     ):

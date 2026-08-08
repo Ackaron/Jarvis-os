@@ -10,6 +10,8 @@ import os
 from dataclasses import dataclass
 from typing import Optional
 
+import core.env  # noqa: F401  side effect: loads .env
+
 
 @dataclass
 class BitrixTask:

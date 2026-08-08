@@ -1,51 +1,56 @@
 version: 1.0
 
+# Anthropic/Claude access via omniroute is currently broken (401 invalid
+# x-api-key, unresolved) — Ollama is primary everywhere for now. See ADR-007.
+# claude-* model definitions are kept below so re-enabling them later is a
+# routing_rules edit, not a rewrite.
+
 defaults:
-  primary_model: claude-opus
-  fallback_chain: [claude-sonnet, ollama-local]
+  primary_model: ollama-local
+  fallback_chain: []
   timeout_seconds: 60
   retry_attempts: 3
 
 routing_rules:
   presentation:
-    primary: claude-opus
-    fallback: [claude-sonnet]
-    reason: "Complex stakeholder preferences, needs creative synthesis"
+    primary: ollama-local
+    fallback: false
+    reason: "Ollama primary while Anthropic access is unresolved (ADR-007)"
     budget_aware: false
     confidence_threshold: 0.8
 
   report:
-    primary: claude-opus
-    fallback: [claude-sonnet]
-    reason: "Data accuracy important, some creativity needed"
+    primary: ollama-local
+    fallback: false
+    reason: "Ollama primary while Anthropic access is unresolved (ADR-007)"
     budget_aware: true
 
   email:
-    primary: claude-sonnet
-    observer: ollama-mistral
-    fallback: [claude-opus]
-    reason: "Sonnet handles tone modulation well, Ollama learns style"
+    primary: ollama-local
+    fallback: false
+    reason: "Ollama primary while Anthropic access is unresolved (ADR-007)"
     confidence_threshold: 0.85
 
   task_classification:
     primary: ollama-local
-    fallback: [claude-sonnet]
-    reason: "Fast, deterministic, no need for Opus"
+    fallback: false
+    reason: "Fast, deterministic, no need for a large model"
     confidence_threshold: 0.7
 
   analysis:
-    primary: claude-opus
+    primary: ollama-local
     fallback: false
-    reason: "Number accuracy non-negotiable"
+    reason: "Ollama primary while Anthropic access is unresolved (ADR-007)"
 
   research:
-    primary: claude-opus
-    fallback: [claude-sonnet]
-    reason: "Needs deep reasoning"
+    primary: ollama-local
+    fallback: false
+    reason: "Ollama primary while Anthropic access is unresolved (ADR-007)"
 
 hybrid_mode:
-  enabled: true
-  observer_models: [ollama-local, ollama-mistral]
+  enabled: false
+  reason: "Observer pattern assumed a working cloud primary to compare against; paused until Anthropic access is restored (ADR-007)"
+  observer_models: [ollama-local]
   sync_interval_tasks: 10
   suggest_override_threshold: 0.95
 
@@ -70,6 +75,7 @@ models:
 
   ollama-local:
     api_provider: local
+    api_model_id: llama3.1  # поменяй на реальный тег после `ollama pull <model>`
     cost_per_1k_tokens: 0.0
     speed_tier: very-fast
     reasoning_quality: medium

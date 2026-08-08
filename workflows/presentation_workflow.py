@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from typing import Callable, Optional
 
 from core.context_engine import ContextEngine
-from core.llm_client import call_anthropic
+from core.llm_dispatch import call_model
 from core.llm_router import execute_with_fallback, route_task
 from core.mentoring import explain_task
 from core.quality_assurance import format_qa_prompt
@@ -35,7 +35,7 @@ class PresentationWorkflow(Workflow):
         task_id: str,
         stakeholder_name: str,
         human_input: HumanInput = cli_human_input,
-        llm_caller: LLMCaller = call_anthropic,
+        llm_caller: LLMCaller = call_model,
         context_engine: Optional[ContextEngine] = None,
         **kwargs,
     ):

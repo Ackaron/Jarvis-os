@@ -36,7 +36,7 @@ def test_email_workflow_without_corrections(stores):
     )
     state = workflow.run()
 
-    assert "[claude-sonnet]" in state["analyze_content"] or "[claude-opus]" in state["analyze_content"]
+    assert "[ollama-local]" in state["analyze_content"]
     assert state["review_response"] == state["generate_response"]
     assert decisions_store.list_decisions(task_id=task["id"]) == []
 

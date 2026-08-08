@@ -1,5 +1,6 @@
 import pytest
 
+from core import llm_client
 from core.llm_client import (
     AnthropicNotConfiguredError,
     UnsupportedModelProviderError,
@@ -68,3 +69,31 @@ def test_call_with_injected_fake_client_returns_text():
     assert result == {"model_used": "claude-opus-5", "text": "Привет от модели"}
     assert client.messages.last_kwargs["model"] == "claude-opus-5"
     assert client.messages.last_kwargs["messages"] == [{"role": "user", "content": "hi"}]
+
+
+def test_get_anthropic_client_passes_base_url_when_set(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "fake-key")
+    monkeypatch.setenv("ANTHROPIC_BASE_URL", "http://localhost:20128")
+    captured = {}
+
+    class FakeAnthropicCls:
+        def __init__(self, **kwargs):
+            captured.update(kwargs)
+
+    monkeypatch.setattr("anthropic.Anthropic", FakeAnthropicCls)
+    llm_client._get_anthropic_client()
+    assert captured == {"api_key": "fake-key", "base_url": "http://localhost:20128"}
+
+
+def test_get_anthropic_client_omits_base_url_when_unset(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "fake-key")
+    monkeypatch.delenv("ANTHROPIC_BASE_URL", raising=False)
+    captured = {}
+
+    class FakeAnthropicCls:
+        def __init__(self, **kwargs):
+            captured.update(kwargs)
+
+    monkeypatch.setattr("anthropic.Anthropic", FakeAnthropicCls)
+    llm_client._get_anthropic_client()
+    assert captured == {"api_key": "fake-key"}

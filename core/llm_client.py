@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 from typing import Any, Optional
 
+import core.env  # noqa: F401  side effect: loads .env
 from core.config_loader import get_routing_config
 
 
@@ -31,7 +32,13 @@ def _get_anthropic_client() -> Any:
         )
     from anthropic import Anthropic  # lazy import: only required for real calls
 
-    return Anthropic(api_key=api_key)
+    client_kwargs: dict[str, Any] = {"api_key": api_key}
+    base_url = os.getenv("ANTHROPIC_BASE_URL")
+    if base_url:
+        # Points at a local proxy/gateway (e.g. omniroute) instead of
+        # api.anthropic.com directly — set by Viktor via .env.
+        client_kwargs["base_url"] = base_url
+    return Anthropic(**client_kwargs)
 
 
 def call_anthropic(

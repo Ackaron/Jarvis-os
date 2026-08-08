@@ -46,7 +46,7 @@
 **Definition of Done Phase 1**: все три воркфлоу проходят end-to-end через pytest со scripted `human_input` и fake LLM caller (без реального ключа), decisions и stakeholder-правки реально пишутся в vault, QA/Mentoring подключены и покрыты тестами.
 
 ### 🟣 Phase 2: Learning & Scheduling + Web UI MVP (Week 3-4)
-Источник: `PROJECT_IDEA.md` → MVP Scope → Phase 2. Границы и UI-решение (подтверждено Виктором напрямую, не навязано) — в [[ADR-006-phase2-scope-and-ui]].
+Источник: `PROJECT_IDEA.md` → MVP Scope → Phase 2. Границы и UI-решение (подтверждено Виктором напрямую, не навязано) — в [[ADR-006-phase2-scope-and-ui]]. **LLM primary — Ollama, не Anthropic** (omniroute-ключ не прошёл авторизацию), провайдер-агностичная развязка через `core/llm_dispatch.call_model` — см. [[ADR-007-ollama-primary]]. При дизайне UI (2b) — использовать skill `anthropic-skills:ui-ux-pro-max` и команду `/ui` (прямое указание Виктора).
 
 **2a — строится сейчас (DI/заглушки, без внешних кредов):**
 1. [ ] `core/learning_loop.py` — profile updates из `decisions_store` через LLM (DI).

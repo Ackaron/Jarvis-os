@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from typing import Callable, Optional
 
-from core.llm_client import call_anthropic
+from core.llm_dispatch import call_model
 from core.llm_router import execute_with_fallback, route_task
 from storage.decisions_store import DecisionStore
 
@@ -26,7 +26,7 @@ def derive_profile_updates(
     stakeholder_name: str,
     task_id: Optional[str] = None,
     decisions_store: Optional[DecisionStore] = None,
-    llm_caller: LLMCaller = call_anthropic,
+    llm_caller: LLMCaller = call_model,
 ) -> dict:
     """Reads decisions (optionally scoped to one task) and asks the LLM to
     extract focus_areas/anti_focus deltas. Returns {} if there's nothing to

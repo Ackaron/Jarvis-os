@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Optional
 
 from core.intent_router import classify_intent
-from core.llm_client import call_anthropic
+from core.llm_dispatch import call_model
 from integrations.telegram import TelegramClient
 from storage.tasks_store import TaskStore
 from workflows.email_workflow import EmailWorkflow
@@ -78,7 +78,7 @@ class TelegramDispatcher:
         self,
         send_message: SendMessage = _default_send_message,
         tasks_store: Optional[TaskStore] = None,
-        llm_caller: LLMCaller = call_anthropic,
+        llm_caller: LLMCaller = call_model,
     ):
         self.send_message = send_message
         self.tasks_store = tasks_store or TaskStore()

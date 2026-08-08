@@ -13,6 +13,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
+import core.env  # noqa: F401  side effect: loads .env
+
 
 @dataclass
 class CalendarEvent:

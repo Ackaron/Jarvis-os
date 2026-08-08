@@ -20,7 +20,7 @@ def test_classify_presentation_for_intc():
     assert data["task_type"] == "presentation"
     assert data["domain"] == "intc"
     assert data["autonomous"] is False
-    assert data["primary_model"] == "claude-opus"
+    assert data["primary_model"] == "ollama-local"
 
 
 def test_classify_unclassified_falls_back_to_other():

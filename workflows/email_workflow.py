@@ -1,13 +1,14 @@
 """Email Correspondence workflow (SPECIFICATION.md Workflow 3), built on
 workflows.engine.Workflow. LLM calls go through core.llm_router with an
-injectable caller (default: core.llm_client.call_anthropic) — see ADR-005.
+injectable caller (default: core.llm_dispatch.call_model, provider picked
+from routing.yaml — see ADR-005/ADR-007).
 """
 
 from __future__ import annotations
 
 from typing import Callable, Optional
 
-from core.llm_client import call_anthropic
+from core.llm_dispatch import call_model
 from core.llm_router import execute_with_fallback, route_task
 from workflows.engine import HumanInput, Workflow, cli_human_input
 
@@ -27,7 +28,7 @@ class EmailWorkflow(Workflow):
         self,
         task_id: str,
         human_input: HumanInput = cli_human_input,
-        llm_caller: LLMCaller = call_anthropic,
+        llm_caller: LLMCaller = call_model,
         **kwargs,
     ):
         super().__init__(task_id, human_input=human_input, **kwargs)
