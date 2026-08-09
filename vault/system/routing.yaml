@@ -19,8 +19,8 @@ defaults:
 routing_rules:
   presentation:
     primary: ollama-main
-    fallback: [ollama-fast]
-    reason: "Formal Russian content generation; complex stakeholder preferences"
+    fallback: false
+    reason: "Formal Russian content generation; complex stakeholder preferences. No fallback to ollama-fast — observed it occasionally drift into Chinese mid-response on formal-writing prompts (see ADR-008 addendum); a clean failure beats a garbled letter sent in Viktor's name."
     budget_aware: false
     confidence_threshold: 0.8
 
@@ -32,8 +32,8 @@ routing_rules:
 
   email:
     primary: ollama-main
-    fallback: [ollama-fast]
-    reason: "Formal Russian tone matters most; 14b handles it well"
+    fallback: false
+    reason: "Formal Russian tone matters most; 14b handles it well. No fallback to ollama-fast — same reliability concern as presentation."
     confidence_threshold: 0.85
 
   task_classification:
