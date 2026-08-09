@@ -7,14 +7,11 @@ pretending to fetch it automatically.
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Callable, Optional
+from typing import Optional
 
 from core.context_engine import ContextEngine
 from core.llm_dispatch import call_model
-from core.llm_router import execute_with_fallback, route_task
-from workflows.engine import HumanInput, Workflow, cli_human_input
-
-LLMCaller = Callable[[str, dict], dict]
+from workflows.engine import HumanInput, LLMCaller, Workflow, cli_human_input
 
 
 class ReportWorkflow(Workflow):
@@ -30,18 +27,10 @@ class ReportWorkflow(Workflow):
         context_engine: Optional[ContextEngine] = None,
         **kwargs,
     ):
-        super().__init__(task_id, human_input=human_input, **kwargs)
+        super().__init__(task_id, human_input=human_input, llm_caller=llm_caller, **kwargs)
         self.domain = domain
         self.topic = topic
-        self.llm_caller = llm_caller
         self.context_engine = context_engine or ContextEngine()
-
-    def _call_llm(self, task_type: str, prompt: str, system: str = "") -> str:
-        decision = route_task(task_type)
-        result = execute_with_fallback(
-            decision, {"prompt": prompt, "system": system}, caller=self.llm_caller
-        )
-        return result["text"]
 
     def fetch_data(self) -> str:
         data = self.context_engine.get_knowledge(self.domain, self.topic)

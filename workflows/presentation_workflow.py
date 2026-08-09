@@ -8,16 +8,13 @@ approval step, matching the SPEC's own worked example (Трутнев presentati
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Callable, Optional
+from typing import Optional
 
 from core.context_engine import ContextEngine
 from core.llm_dispatch import call_model
-from core.llm_router import execute_with_fallback, route_task
 from core.mentoring import explain_task
 from core.quality_assurance import format_qa_prompt
-from workflows.engine import HumanInput, Workflow, cli_human_input
-
-LLMCaller = Callable[[str, dict], dict]
+from workflows.engine import HumanInput, LLMCaller, Workflow, cli_human_input
 
 
 class PresentationWorkflow(Workflow):
@@ -39,17 +36,9 @@ class PresentationWorkflow(Workflow):
         context_engine: Optional[ContextEngine] = None,
         **kwargs,
     ):
-        super().__init__(task_id, human_input=human_input, **kwargs)
+        super().__init__(task_id, human_input=human_input, llm_caller=llm_caller, **kwargs)
         self.stakeholder_name = stakeholder_name
-        self.llm_caller = llm_caller
         self.context_engine = context_engine or ContextEngine()
-
-    def _call_llm(self, task_type: str, prompt: str, system: str = "") -> str:
-        decision = route_task(task_type)
-        result = execute_with_fallback(
-            decision, {"prompt": prompt, "system": system}, caller=self.llm_caller
-        )
-        return result["text"]
 
     def confirm_stakeholder(self) -> Optional[dict]:
         return self.context_engine.get_stakeholder(self.stakeholder_name)

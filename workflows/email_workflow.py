@@ -1,18 +1,12 @@
 """Email Correspondence workflow (SPECIFICATION.md Workflow 3), built on
-workflows.engine.Workflow. LLM calls go through core.llm_router with an
-injectable caller (default: core.llm_dispatch.call_model, provider picked
-from routing.yaml — see ADR-005/ADR-007).
+workflows.engine.Workflow. LLM calls go through Workflow._call_llm, which
+applies the base system prompt (core.system_prompt) and picks a provider via
+core.llm_dispatch.call_model based on routing.yaml — see ADR-005/ADR-007.
 """
 
 from __future__ import annotations
 
-from typing import Callable, Optional
-
-from core.llm_dispatch import call_model
-from core.llm_router import execute_with_fallback, route_task
-from workflows.engine import HumanInput, Workflow, cli_human_input
-
-LLMCaller = Callable[[str, dict], dict]
+from workflows.engine import Workflow
 
 
 class EmailWorkflow(Workflow):
@@ -23,23 +17,6 @@ class EmailWorkflow(Workflow):
         "generate_response",
         "review_response",
     ]
-
-    def __init__(
-        self,
-        task_id: str,
-        human_input: HumanInput = cli_human_input,
-        llm_caller: LLMCaller = call_model,
-        **kwargs,
-    ):
-        super().__init__(task_id, human_input=human_input, **kwargs)
-        self.llm_caller = llm_caller
-
-    def _call_llm(self, task_type: str, prompt: str, system: str = "") -> str:
-        decision = route_task(task_type)
-        result = execute_with_fallback(
-            decision, {"prompt": prompt, "system": system}, caller=self.llm_caller
-        )
-        return result["text"]
 
     def intake_letter(self) -> str:
         return self.ask("Вставь текст письма для анализа:")

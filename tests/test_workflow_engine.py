@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from core.system_prompt import BASE_SYSTEM_PROMPT
 from storage.decisions_store import DecisionStore
 from storage.tasks_store import TaskStore
 from tests.helpers import ScriptedHumanInput
@@ -16,6 +17,13 @@ class _EchoWorkflow(Workflow):
 
     def ask_name(self) -> str:
         return self.ask("What's your name?")
+
+
+class _GeneratingWorkflow(Workflow):
+    steps = ["generate"]
+
+    def generate(self) -> str:
+        return self._call_llm("email", prompt="hi", system="Ты пишешь письма.")
 
 
 @pytest.fixture
@@ -71,3 +79,24 @@ def test_explain_reports_no_corrections_by_default(stores):
     )
     workflow.run()
     assert "не было" in workflow.explain()
+
+
+def test_call_llm_combines_base_system_prompt_with_task_specific_one(stores):
+    tasks_store, decisions_store = stores
+    task = tasks_store.create_task(title="Test", task_type="email")
+    captured = {}
+
+    def capturing_caller(model_name, task_dict):
+        captured.update(task_dict)
+        return {"model_used": model_name, "text": "ok"}
+
+    workflow = _GeneratingWorkflow(
+        task["id"],
+        llm_caller=capturing_caller,
+        tasks_store=tasks_store,
+        decisions_store=decisions_store,
+    )
+    workflow.run()
+
+    assert captured["system"].startswith(BASE_SYSTEM_PROMPT)
+    assert captured["system"].endswith("Ты пишешь письма.")

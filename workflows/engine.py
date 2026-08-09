@@ -10,11 +10,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
+from core.llm_dispatch import call_model
+from core.llm_router import execute_with_fallback, route_task
 from core.mentoring import explain_task
+from core.system_prompt import with_base
 from storage.decisions_store import DecisionStore
 from storage.tasks_store import TaskStore
 
 HumanInput = Callable[[str, Optional[dict]], Any]
+LLMCaller = Callable[[str, dict], dict]
 
 
 def cli_human_input(prompt: str, context: Optional[dict] = None) -> Any:
@@ -39,11 +43,13 @@ class Workflow:
         self,
         task_id: str,
         human_input: HumanInput = cli_human_input,
+        llm_caller: LLMCaller = call_model,
         tasks_store: Optional[TaskStore] = None,
         decisions_store: Optional[DecisionStore] = None,
     ):
         self.task_id = task_id
         self.human_input = human_input
+        self.llm_caller = llm_caller
         self.tasks_store = tasks_store or TaskStore()
         self.decisions_store = decisions_store or DecisionStore()
         self.state: dict[str, Any] = {}
@@ -51,6 +57,18 @@ class Workflow:
 
     def ask(self, prompt: str, context: Optional[dict] = None) -> Any:
         return self.human_input(prompt, context or {})
+
+    def _call_llm(self, task_type: str, prompt: str, system: str = "") -> str:
+        """Every real generation call goes through here so the base system
+        prompt (core.system_prompt.BASE_SYSTEM_PROMPT) is applied uniformly —
+        see the injected-prompt discussion that led to ADR-010."""
+        decision = route_task(task_type)
+        result = execute_with_fallback(
+            decision,
+            {"prompt": prompt, "system": with_base(system)},
+            caller=self.llm_caller,
+        )
+        return result["text"]
 
     def record_correction(
         self,
