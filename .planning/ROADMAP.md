@@ -48,24 +48,23 @@
 ### 🟣 Phase 2: Learning & Scheduling + Web UI MVP (Week 3-4)
 Источник: `PROJECT_IDEA.md` → MVP Scope → Phase 2. Границы и UI-решение (подтверждено Виктором напрямую, не навязано) — в [[ADR-006-phase2-scope-and-ui]]. **LLM primary — Ollama, не Anthropic** (omniroute-ключ не прошёл авторизацию), провайдер-агностичная развязка через `core/llm_dispatch.call_model` — см. [[ADR-007-ollama-primary]]. При дизайне UI (2b) — использовать skill `anthropic-skills:ui-ux-pro-max` и команду `/ui` (прямое указание Виктора).
 
-**2a — строится сейчас (DI/заглушки, без внешних кредов):**
-1. [ ] `core/learning_loop.py` — profile updates из `decisions_store` через LLM (DI).
-2. [ ] `core/estimation.py` — оценка времени из истории `tasks_store` (avg/variance/confidence по task_type).
-3. [ ] `core/reminders.py` — логика "кому нужно напоминание" (24ч/4ч/1ч до дедлайна), канал доставки через DI.
-4. [ ] `integrations/google_calendar.py` — структурная заглушка (как Bitrix/FusionPOS). *(независимо от 1-3)*
-5. [ ] `core/scheduler.py` — поиск свободных слотов по календарным событиям (DI, без реального Calendar). *(зависит от 4)*
-6. [ ] `interfaces/telegram_bot.py` — реальные хендлеры `/new_task`/`/status`/`/approve`/`/reject` на `python-telegram-bot`, `human_input` через Telegram. *(зависит от `workflows/engine.py`, Phase 1)*
-7. [ ] pytest на 1-6 (fake calendar events, fake Update/Context, fake LLM caller).
+**2a — реализовано:**
+1. [x] `core/learning_loop.py` — profile updates из `decisions_store` через LLM (DI).
+2. [x] `core/estimation.py` — оценка времени из истории `tasks_store` (avg/variance/confidence по task_type).
+3. [x] `core/reminders.py` — логика "кому нужно напоминание" (24ч/4ч/1ч до дедлайна), канал доставки через DI.
+4. [x] `integrations/google_calendar.py` — структурная заглушка (как Bitrix/FusionPOS).
+5. [x] `core/scheduler.py` — поиск свободных слотов по календарным событиям (DI, без реального Calendar).
+6. [x] `interfaces/telegram_bot.py` — реальный диспетчер `/new_task`/`/status` через очередь (`TelegramDispatcher`/`TelegramHumanInput`), без `python-telegram-bot` — переиспользует `human_input`-контракт `workflows/engine.py` напрямую (см. STATE.md, отклонение от исходного плана).
+7. [x] pytest на 1-6 — зелёные.
 
-**2b — Web UI MVP (по решению Виктора, требует Node.js — блокер, см. вопрос ниже):**
-8. [ ] `interfaces/api.py` (FastAPI) — `POST /api/classify`, прогоняет ввод через `intent_router`+`llm_router`. *(зависит от Phase 0)*
-9. [ ] `web/` — минимальный Next.js 15 чат-экран (только классификация, БЕЗ многошагового воркфлоу-чата — это отдельный ADR при переходе к high-fidelity UI/UX), нейтральный Tailwind-визуал, без uipro/21st.dev. *(зависит от 8, требует Node.js 20+/npm — установить должен Виктор)*
-10. [ ] Проверить `npm run build` + ручной прогон в браузере (per `.rules/testing.md`).
+**2b — Web UI MVP: реализовано и провалидировано в браузере.**
+8. [x] `interfaces/api.py` (FastAPI) — `POST /api/classify`, прогоняет ввод через `intent_router`+`llm_router`.
+9. [x] `web/` — минимальный Next.js 15 чат-экран (только классификация, БЕЗ многошагового воркфлоу-чата), дизайн-токены через `anthropic-skills:ui-ux-pro-max` (синий `#2563EB`, Inter, light+dark), `next.config.ts` rewrites `/backend/*` → FastAPI (без CORS).
+10. [x] `npm run build` + `npm run lint` — чисто. Ручной прогон в браузере через `.claude/launch.json` (backend+web) — оба сценария (presentation/email) отработали end-to-end на реальных Ollama-моделях, 0 ошибок консоли.
 
 **2c — заблокировано, требует действий Виктора:**
-- `TELEGRAM_BOT_TOKEN` (от @BotFather) — для реального запуска бота из 6.
+- `TELEGRAM_BOT_TOKEN` (от @BotFather) — для реального запуска polling-лупа диспетчера из 6.
 - `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` — для реального Calendar вместо заглушки из 4.
-- **Node.js 20+/npm** — не установлены, нужны для задачи 9.
 
 **Явно не входит в Phase 2** (см. ADR-006 §2b): "Desktop ↔ Telegram sync" — следующая задача сразу после стабилизации Web UI MVP; полноценный high-fidelity UI/UX — отдельный проход через `/ui` + `.rules/ui-ux.md` позже.
 
