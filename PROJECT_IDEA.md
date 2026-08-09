@@ -226,7 +226,8 @@ Viktor (PM, предприниматель, инноватор) решает е�
 - [ ] Auto-execution in free slots
 - [ ] Parallel execution
 - [ ] Dashboard (burndown, quality metrics, LLM performance)
-- [ ] 3D Graph visualization
+- [ ] 2D memory graph (force-directed, not 3D/Three.js — see ADR-009), node click → detail panel with an autonomy ladder (human-led → human-assisted → fully autonomous) instead of a bare boolean
+- [ ] Second Brain search: question → answer + cited vault sources (extends `context_engine`)
 
 ### Монетизация (Not for MVP, but future)
 1. **Personal use** → no monetization, just value creation (time savings)
@@ -256,7 +257,7 @@ Viktor (PM, предприниматель, инноватор) решает е�
 ├─────────────────────────────────────┤
 │  Web UI (Next.js)                   │
 │  ├─ Chat (primary input)            │
-│  ├─ 3D Graph (memory vis)           │
+│  ├─ Memory Graph (2D, see ADR-009)  │
 │  ├─ Calendar (scheduling)           │
 │  ├─ Dashboard (metrics)             │
 │  └─ Plugin Manager (CRUD)           │

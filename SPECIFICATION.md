@@ -1295,11 +1295,11 @@ Real-time updates: Task progresses as conversation flows
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Screen 5: 3D Graph Visualization
+### Screen 5: Memory Graph (2D, see ADR-009)
+
+Force-directed 2D graph (e.g. `react-force-graph-2d`/`d3-force` — canvas/SVG, no Three.js/WebGL), per ADR-009: same node/edge model originally planned for a 3D scene, rendered flat — cheaper to build and maintain, same visual clarity.
 
 ```
-(3D node graph rendering with Three.js)
-
 Nodes:
 - Blue circles: Tasks (color: domain)
 - Green circles: Stakeholders
@@ -1308,9 +1308,9 @@ Nodes:
 - Gray nodes: Knowledge base
 
 Interactions:
-- Rotate: Mouse drag
+- Pan: Mouse drag
 - Zoom: Scroll
-- Click node: Show details in sidebar
+- Click node: Show details panel (slides in, see below)
 - Search: Filter nodes, highlight paths
 - Zoom to cluster: Double-click domain node
 
@@ -1321,25 +1321,50 @@ Example view:
 - Time-based coloring: Recent (bright), Old (dim)
 - Edge thickness: Frequency of interaction
 
-Sidebar:
-┌──────────────────┐
-│ Selected: Трутнев│
-│                  │
-│ Role: Инвестор   │
-│ Interactions: 5  │
-│ Confidence: 0.95 │
-│                  │
-│ Preferences:     │
-│ • Инвестиции    │
-│ • Продукты       │
-│ • Светлый фон    │
-│                  │
-│ Recent Tasks:    │
-│ • Presentation.. │
-│ • Email to...    │
-│                  │
-│ [Details]        │
-└──────────────────┘
+Detail panel (per ADR-009 — includes an autonomy ladder, not just a flat "autonomous: bool"):
+┌──────────────────────────┐
+│ Selected: Трутнев        │
+│                          │
+│ Role: Инвестор           │
+│ Interactions: 5          │
+│ Confidence: 0.95         │
+│                          │
+│ Preferences:             │
+│ • Инвестиции             │
+│ • Продукты               │
+│ • Светлый фон            │
+│                          │
+│ Autonomy ladder (latest task):
+│ ○ Human-led              │
+│ ● Human-assisted         │
+│ ○ Fully autonomous       │
+│   "Viktor confirms structure,
+│    system fills content"  │
+│                          │
+│ Recent Tasks:            │
+│ • Presentation..         │
+│ • Email to...            │
+│                          │
+│ [Details]                │
+└──────────────────────────┘
+```
+
+### Screen 5b: Second Brain Search (see ADR-009)
+
+Question → answer assembled from `context_engine` (+ LLM), with the actual vault notes it drew from — directly extends the existing `get_stakeholder`/`get_knowledge` lookups, not a new data layer.
+
+```
+┌─────────────────────────────────────────────────┐
+│ Search: "Что мы обещали Трутневу по срокам?"     │
+├─────────────────────────────────────────────────┤
+│ Ответ: По последней презентации (2026-07-25)     │
+│ подтверждён срок запуска НОКов — Q4 2026.        │
+│                                                   │
+│ Источники:                                       │
+│ • stakeholders/Трутнев.md                        │
+│ • templates/presentations/2026-07-25_....md      │
+│   [Открыть]                                      │
+└─────────────────────────────────────────────────┘
 ```
 
 ### Screen 6: Plugin Manager

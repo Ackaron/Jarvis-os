@@ -69,10 +69,13 @@
 **Явно не входит в Phase 2** (см. ADR-006 §2b): "Desktop ↔ Telegram sync" — следующая задача сразу после стабилизации Web UI MVP; полноценный high-fidelity UI/UX — отдельный проход через `/ui` + `.rules/ui-ux.md` позже.
 
 ### 🔴 Phase 3: Autonomy (Week 4+)
+UI-направление для этой фазы — референс [skilltree.altari.ai](https://skilltree.altari.ai), решение зафиксировано в [[ADR-009-memory-graph-and-autonomy-ladder]].
+
 - [ ] Автовыполнение в свободных слотах календаря.
 - [ ] Параллельное выполнение задач.
-- [ ] Dashboard (burndown, quality metrics, LLM performance).
-- [ ] 3D Graph визуализация памяти (Three.js/Babylon.js).
+- [ ] Dashboard (burndown, quality metrics, LLM performance) — KPI-строка + график + список сигналов.
+- [ ] Memory Graph — 2D force-directed (не 3D/Three.js), клик по ноде → детальная панель с autonomy ladder (human-led/human-assisted/fully-autonomous) вместо булева `autonomous`.
+- [ ] Second Brain поиск: вопрос → ответ с цитируемыми источниками из vault (расширение `context_engine`).
 
 ---
 

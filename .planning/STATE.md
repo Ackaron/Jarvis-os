@@ -1,13 +1,14 @@
 # 🚀 Current Project State
 
 ## 📍 Активная задача
-- **Задача**: Phase 2 полностью закрыт (2a + 2b Web UI MVP), провалидирован end-to-end в браузере на реальных Ollama-моделях. Следующий шаг — `/plan` для Phase 3 (Autonomy) или доработка Desktop↔Telegram sync поверх MVP UI.
+- **Задача**: Phase 2 полностью закрыт. UI-направление Phase 3 определено по референсу Виктора ([skilltree.altari.ai](https://skilltree.altari.ai)) — 2D memory graph (не 3D), autonomy ladder, second-brain поиск с источниками. Пока только доки/ADR, кода Phase 3 ещё нет. Следующий шаг — `/plan` для Phase 3 (Autonomy) или Desktop↔Telegram sync поверх MVP UI.
 - **Субагент**: свободен, ждёт направления от Виктора.
-- **Связанный файл**: `[[ADR-006-phase2-scope-and-ui]]`, `[[ADR-008-ollama-model-tiers]]`.
+- **Связанный файл**: `[[ADR-009-memory-graph-and-autonomy-ladder]]`, `[[ADR-006-phase2-scope-and-ui]]`.
 
 ---
 
 ## ✅ Последние шаги (Completed)
+0. **Phase 3 UI-направление зафиксировано** (2026-08-09): изучил референс Виктора [skilltree.altari.ai](https://skilltree.altari.ai) сам (не только по пересказу) — уточнил, что их "tree map" на самом деле узловой граф (не оргчарт-дерево), просто 2D/плоский вместо WebGL-3D. Взял два конкретных паттерна: карточка ноды с "лестницей автономности" (human-led/human-assisted/fully-autonomous вместо булева `autonomous`) и second-brain поиск с цитируемыми источниками. Обновлены `PROJECT_IDEA.md` (Key Feature, Phase 3 scope), `SPECIFICATION.md` (Screen 5/5b), `ROADMAP.md` (Phase 3). См. [[ADR-009-memory-graph-and-autonomy-ladder]]. Кода Phase 3 ещё не писал — это только doc/ADR обновление.
 1. `PROJECT_IDEA.md`/`SPECIFICATION.md` написаны; generic-зависимости вырезаны.
 2. **Phase 0-1**: backend-скелет + три воркфлоу. См. [[ADR-004-phase0-scaffold]], [[ADR-005-phase1-workflows]].
 3. **Phase 2a**: learning_loop/estimation/reminders/scheduler/google_calendar-заглушка/telegram-диспетчер.
