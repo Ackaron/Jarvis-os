@@ -3,7 +3,7 @@ type: index
 status: active
 tags: [gsd, knowledge-base, hub]
 created: 2026-03-20
-updated: 2026-03-20
+updated: 2026-08-09
 ---
 
 # 🧠 Knowledge Vault Index (MOC)
@@ -11,12 +11,12 @@ updated: 2026-03-20
 Этот раздел является "вторым мозгом" проекта и центральным узлом навигации (Map of Content). Здесь хранятся долгосрочные знания, архитектурные решения и контекст, который агент использует для глубокого понимания проекта между сессиями.
 
 ## 🏛 [[Architecture]]
-- **Decision Records**: Решения по стеку, логика базы данных и ключевые паттерны.
+- **Decision Records**: [[ADR-004-phase0-scaffold]] · [[ADR-005-phase1-workflows]] · [[ADR-006-phase2-scope-and-ui]] · [[ADR-007-ollama-primary]] · [[ADR-008-ollama-model-tiers]] · [[ADR-009-memory-graph-and-autonomy-ladder]] · [[ADR-010-jarvis-system-prompt]] (плюс отменённый [[ADR-003-ui-strategy]]).
 - **Templates**: См. [[ADR_TEMPLATE]] для записи новых архитектурных решений.
-- **Database**: Описание схем Prisma и политик RLS для Supabase.
+- **Storage**: Локальные JSON-хранилища (`storage/tasks_store.py`, `storage/decisions_store.py`) — не Prisma/Supabase, см. [[ADR-004-phase0-scaffold]].
 
 ## 📝 [[Sessions]]
-- **Chronology**: История работы и лог сессий, создаваемый командой `/save`.
+- **Chronology**: [[2026-08-09_bootstrap-to-phase2-and-ollama-pivot]] — от чистого репозитория до Phase 2 + смена LLM-провайдера на Ollama.
 - **Context Recovery**: Позволяет быстро восстановить нить разработки после перерыва или переключения между задачами.
 
 ## 🧩 [[Modules]]

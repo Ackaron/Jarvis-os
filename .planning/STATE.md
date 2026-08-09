@@ -21,7 +21,7 @@
 - Ничего не в процессе. Backend и MVP UI полностью рабочие end-to-end на реальных моделях.
 
 ## 🧠 Контекст для модели (Memory)
-- **Текущая сессия**: лог ещё не сохранён (`/save` не вызывался).
+- **Текущая сессия**: сохранена — [[2026-08-09_bootstrap-to-phase2-and-ollama-pivot]].
 - **Отклонение от ADR-006**: `interfaces/telegram_bot.py` не использует `python-telegram-bot` — своя dispatch-логика на очередях (`TelegramDispatcher`/`TelegramHumanInput`), переиспользует `human_input`-контракт `workflows/engine.py` напрямую.
 - **UI-решение реализовано**: `web/` — только Chat Interface, только классификация (`POST /api/classify`), БЕЗ многошагового чата поверх `workflows.engine` (нужны сессии/WebSocket — отдельный ADR, когда дойдём до high-fidelity прохода). Client Component на всей странице (весь UI интерактивный, серверных данных при загрузке нет).
 - **Надёжность моделей**: `ollama-fast` (7B) годен только для constrained-задач (классификация, JSON). Не использовать как fallback для presentation/email.
